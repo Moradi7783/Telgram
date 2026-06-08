@@ -445,7 +445,7 @@ class PolyvandViewModel(application: Application) : AndroidViewModel(application
     // Helper formatter
     fun formatTimestamp(timestamp: Long): String {
         return try {
-            val sdf = SimpleDateFormat("HH:mm - yyyy/MM/dd", Locale("fa", "IR"))
+            val sdf = SimpleDateFormat("HH:mm - yyyy/MM/dd", Locale("fa"))
             sdf.format(Date(timestamp))
         } catch (e: Exception) {
             SimpleDateFormat("HH:mm - MM/dd", Locale.getDefault()).format(Date(timestamp))
