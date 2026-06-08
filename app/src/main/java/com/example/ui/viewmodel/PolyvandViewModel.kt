@@ -234,33 +234,35 @@ class PolyvandViewModel(application: Application) : AndroidViewModel(application
         val username = targetUsername.replace("@", "").trim()
         if (username.isEmpty()) return
 
+        // Immediately select the channel username to show existing local database cache at lightning-fast speed
+        _selectedChannelUsername.value = username
+
         viewModelScope.launch {
             _syncingChannel.value = username
-            _syncStatusMessage.value = "موتور در حال اتصال به سرور آینه محلی..."
-            kotlinx.coroutines.delay(800)
+            _syncStatusMessage.value = "موتور در حال اتصال به سرور همتا..."
+            kotlinx.coroutines.delay(400)
 
             // Select active mirror if any, otherwise default to "https://ir-mirror1.polyvand.ir"
             val activeMirror = allMirrors.value.firstOrNull { it.isActive }?.url ?: "https://ir-mirror1.polyvand.ir"
-            _syncStatusMessage.value = "جستجو روی سرور پسیو $activeMirror..."
-            kotlinx.coroutines.delay(1000)
+            _syncStatusMessage.value = "$activeMirror اتصال مقاوم با گره ملی..."
+            kotlinx.coroutines.delay(500)
 
-            _syncStatusMessage.value = "در حال بازخوانی هش‌های کانال..."
-            kotlinx.coroutines.delay(700)
+            _syncStatusMessage.value = "در حال بازخوانی هش‌ها و دور زدن فیلترینگ..."
+            kotlinx.coroutines.delay(400)
 
             try {
                 // Returns newly cached posts if any
                 val posts = repository.syncWithMirror(activeMirror, username)
                 if (posts.isNotEmpty()) {
-                    _syncStatusMessage.value = "همگام‌سازی تکمیل شد! تعداد ${posts.size} پست ذخیره گشت."
-                    _selectedChannelUsername.value = username
+                    _syncStatusMessage.value = "همگام‌سازی تکمیل شد! تعداد ${posts.size} پست جدید بازیابی شد."
                 } else {
-                    _syncStatusMessage.value = "آرشیو محلی این کانال از پیش همگام بود."
+                    _syncStatusMessage.value = "آرشیو محلی کانال خوانده شد. مطالب به روز هستند."
                 }
             } catch (e: Exception) {
-                _syncStatusMessage.value = "خطا در برقراری ارتباط با هاب محلی: ${e.message}"
+                _syncStatusMessage.value = "خطا در اتصال به هاب: ${e.message}"
             }
 
-            kotlinx.coroutines.delay(3000)
+            kotlinx.coroutines.delay(2000)
             _syncingChannel.value = null
             _syncStatusMessage.value = null
             _newChannelInput.value = ""

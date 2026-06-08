@@ -38,6 +38,8 @@ import com.example.ui.viewmodel.PolyvandViewModel
 import com.example.ui.theme.LimeActivePing
 import com.example.ui.theme.TextGreenMuted
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Brush
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -311,44 +313,43 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        // Space header
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(4.dp)) }
 
-        // 1. Channel Sync Input Box (Request specific ID)
+        // 1. Unified Instant Channel Finder / Join Bar (Top Main Feature)
         item {
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(20.dp))
             ) {
                 Column(
                     modifier = Modifier.padding(14.dp),
                     horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = "همگام‌سازی از آینه داخلی",
-                        fontWeight = FontWeight.Bold,
+                        text = "عضویت آفلاین و نمایش کانال",
+                        fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.primary,
-                        fontSize = (13 * multiplier).sp,
+                        fontSize = (14 * multiplier).sp,
                         textAlign = TextAlign.Right
                     )
                     Text(
-                        text = "آیدی کانال را بدون @ وارد کنید تا پست‌های اخیر آن را کش کند",
+                        text = "آیدی کانال تلگرام را بنویسید؛ با بالاترین سرعت مطالب آن بالا می‌آید",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = (10 * multiplier).sp,
                         textAlign = TextAlign.Right,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 10.dp)
                     )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Action sync triggering button
+                        // Quick Action search button
                         Button(
                             onClick = {
                                 if (newChannelInput.isNotEmpty()) {
@@ -357,7 +358,7 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
                                 }
                             },
                             enabled = syncingChannel == null && newChannelInput.isNotBlank(),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(12.dp),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                             modifier = Modifier
                                 .height(46.dp)
@@ -371,25 +372,25 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
                                 )
                             } else {
                                 Icon(
-                                    imageVector = Icons.Default.Send, 
-                                    contentDescription = "جذب", 
+                                    imageVector = Icons.Default.Search, 
+                                    contentDescription = "یافتن و بروزرسانی", 
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("جذب", fontSize = (11 * multiplier).sp, fontWeight = FontWeight.Bold)
+                                Text("نمایش", fontSize = (11 * multiplier).sp, fontWeight = FontWeight.Bold)
                             }
                         }
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        // TextField for Username Input (Arabic/Farsi support)
+                        // RTL Text input field
                         OutlinedTextField(
                             value = newChannelInput,
                             onValueChange = { viewModel.setNewChannelInput(it) },
                             placeholder = { 
                                 Text(
-                                    "مثلاً akharinkhabar", 
-                                    fontSize = 12.sp, 
+                                    "مثلاً VahidOnline یا akharinkhabar", 
+                                    fontSize = 11.sp, 
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                     textAlign = TextAlign.Right,
                                     modifier = Modifier.fillMaxWidth()
@@ -409,7 +410,7 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
                                     }
                                 }
                             ),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .weight(1f)
                                 .height(46.dp)
@@ -417,24 +418,286 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                                 unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
-                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                             )
                         )
                     }
 
-                    // Progress Status Message
+                    // Network Sync Step Alerts & Status Messages
                     AnimatedVisibility(visible = syncStatusMessage != null) {
                         syncStatusMessage?.let { msg ->
-                            Text(
-                                text = "⏳ $msg",
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = (11 * multiplier).sp,
-                                fontWeight = FontWeight.Medium,
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 8.dp),
-                                textAlign = TextAlign.Right
+                                    .padding(top = 10.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+                                    .border(1.dp, MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
+                                    .padding(8.dp),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = msg,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = (11 * multiplier).sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Right
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(12.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    strokeWidth = 1.5.dp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Telegram Member Card (Active Channel Profile)
+        if (selectedChannel != null) {
+            val selectedClean = selectedChannel!!.replace("@", "").trim()
+            val channelInfo = allChannelsList.firstOrNull { it.username.lowercase() == selectedClean.lowercase() }
+            
+            item {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(20.dp))
+                ) {
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        // Header Row with Channel Avatar & Badges
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Subscribed Indicators & Pulse Check
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color(0xFFE8F5E9))
+                                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "عضو ارشد",
+                                        tint = Color(0xFF2E7D32),
+                                        modifier = Modifier.size(10.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = "مشترک فعال",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF2E7D32)
+                                    )
+                                }
+                                
+                                Row(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color(0xFF001D35))
+                                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(5.dp)
+                                            .clip(RoundedCornerShape(2.5.dp))
+                                            .background(Color(0xFF00E676))
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = "اتصال ضد فیلتر",
+                                        fontSize = 9.sp,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            // Channel Profile detail
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = channelInfo?.title ?: "کانال @$selectedClean",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                                        fontSize = (14 * multiplier).sp
+                                    )
+                                    Text(
+                                        text = "@$selectedClean",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontSize = (10 * multiplier).sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+
+                                // Stylish Circle Avatar
+                                val avatarInitials = if (selectedClean.length >= 2) selectedClean.take(2).uppercase() else selectedClean.take(1).uppercase()
+                                Box(
+                                    modifier = Modifier
+                                        .size(46.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            Brush.linearGradient(
+                                                colors = listOf(Color(0xFFD3E3FD), Color(0xFFFDE293))
+                                            )
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = avatarInitials,
+                                        color = Color(0xFF001D35),
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Description
+                        Text(
+                            text = channelInfo?.description ?: "تمامی محتویات این کانال بدون سانسور اینترنتی، از طریق همزمان با آینه‌های ضد فیلتر ملی و شبکه مش همتا به همتا فیزیکی بارگذاری می‌شوند.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = (10 * multiplier).sp,
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Force Resync/Refresh Action Row (Highly resilient)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Leave button
+                            OutlinedButton(
+                                onClick = { viewModel.selectChannel(null) },
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                                modifier = Modifier.weight(1f),
+                                contentPadding = PaddingValues(vertical = 4.dp)
+                            ) {
+                                Text("نمایش همه کانال‌ها", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            }
+
+                            // Dynamic high-speed refresh button
+                            Button(
+                                onClick = { viewModel.syncChannelViaActiveMirrors(selectedClean) },
+                                shape = RoundedCornerShape(10.dp),
+                                enabled = syncingChannel == null,
+                                modifier = Modifier.weight(2.5f),
+                                contentPadding = PaddingValues(vertical = 4.dp)
+                            ) {
+                                Icon(Icons.Default.Refresh, contentDescription = "به‌روزرسانی", modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("به‌روزرسانی سریع (ضد فیلترینگ شدید)", fontSize = (9.5 * multiplier).sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. User Joined Channels Story Circles List (Only shown if no channel selected or as quick toggle bar)
+        item {
+            Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "کانال‌های نشان شده اخیراً (فوری):",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = (10 * multiplier).sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 6.dp, end = 4.dp)
+                )
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    reverseLayout = true
+                ) {
+                    item {
+                        val isAllSelected = selectedChannel == null
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable { viewModel.selectChannel(null) }
+                                .padding(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(46.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isAllSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(2.dp, if (isAllSelected) MaterialTheme.colorScheme.primary else Color.Transparent, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Home,
+                                    contentDescription = "همه",
+                                    tint = if (isAllSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(3.dp))
+                            Text("همه", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (isAllSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+
+                    items(allChannelsList) { ch ->
+                        val isChSelected = selectedChannel?.lowercase() == ch.username.lowercase()
+                        val initials = if (ch.username.length >= 2) ch.username.take(2).uppercase() else ch.username.take(1).uppercase()
+                        
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable { viewModel.selectChannel(ch.username) }
+                                .padding(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(46.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isChSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface)
+                                    .border(
+                                        2.dp, 
+                                        if (isChSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, 
+                                        CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = initials,
+                                    color = if (isChSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 12.sp
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(3.dp))
+                            Text(
+                                text = ch.title.take(10), 
+                                fontSize = 9.sp, 
+                                fontWeight = FontWeight.Bold,
+                                color = if (isChSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -442,7 +705,7 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
             }
         }
 
-        // 2. Offline Full-Text Post Search Bar (High Density round styling)
+        // 4. Offline Post Message Filter Search Bar
         item {
             OutlinedTextField(
                 value = searchQuery,
@@ -458,80 +721,36 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
                     Icon(
                         imageVector = Icons.Default.Search, 
                         contentDescription = "جستجو", 
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
                     ) 
                 },
                 placeholder = { 
                     Text(
-                        "جستجوی آفلاین در میان مطالب ذخیره شده...", 
-                        fontSize = 12.sp, 
+                        "جستجو در متن مطالب کانال...", 
+                        fontSize = 11.sp, 
                         textAlign = TextAlign.Right, 
                         style = LocalTextStyle.current.copy(textDirection = TextDirection.Rtl),
                         modifier = Modifier.fillMaxWidth()
                     ) 
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(28.dp),
+                shape = RoundedCornerShape(14.dp),
                 textStyle = LocalTextStyle.current.copy(textDirection = TextDirection.Rtl),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
+                    .height(48.dp)
                     .testTag("input_search_posts"),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                    unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
 
-        // 3. Channels Chips List (Filtering)
-        item {
-            Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "کانال‌های همگام شده و مشترک:",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = (10 * multiplier).sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 6.dp)
-                )
-
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    reverseLayout = true // For Persian RTL visual flow
-                ) {
-                    item {
-                        val isSelected = selectedChannel == null
-                        SuggestionChip(
-                            onClick = { viewModel.selectChannel(null) },
-                            label = { Text("همه مطالب") },
-                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
-                                labelColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-                            ),
-                            modifier = Modifier.testTag("chip_all")
-                        )
-                    }
-
-                    items(allChannelsList) { ch ->
-                        val isSelected = selectedChannel == ch.username
-                        SuggestionChip(
-                            onClick = { viewModel.selectChannel(ch.username) },
-                            label = { Text(text = "${ch.title} (@${ch.username})") },
-                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
-                                labelColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-                            ),
-                            modifier = Modifier.testTag("chip_channel_${ch.username}")
-                        )
-                    }
-                }
-            }
-        }
-
-        // Empty Feed State Handled Cleanly
+        // Empty Feed Stream Handling
         if (postsList.isEmpty()) {
             item {
                 Column(
@@ -554,7 +773,7 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
                         fontSize = (13 * multiplier).sp
                     )
                     Text(
-                        text = "اگر کانال جدیدی است، دکمه جذب بالا را بزنید یا بقچه پیام‌ها را در تب بقچه بارگذاری کنید.",
+                        text = "با وارد کردن آیدی معتبر در نوار جستجوی بالا، کانال موازی را به صورت تضمینی همگام‌سازی کنید.",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = (10 * multiplier).sp,
                         textAlign = TextAlign.Center,
@@ -565,7 +784,7 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
                 }
             }
         } else {
-            // 4. Feed Stream Posts List
+            // 5. High-Speed Rendered Local Streams
             items(postsList, key = { it.id }) { post ->
                 PostItemCard(post, viewModel, multiplier)
             }
