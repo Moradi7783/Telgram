@@ -945,8 +945,7 @@ fun PostItemCard(post: Post, viewModel: PolyvandViewModel, multiplier: Float) {
                                 model = post.mediaUrl,
                                 contentDescription = "قالب تصویری کانال",
                                 modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                error = painterResource(id = android.R.drawable.ic_menu_gallery)
+                                contentScale = ContentScale.Crop
                             )
                             
                             // High-speed local cache alert tag
@@ -1006,8 +1005,7 @@ fun PostItemCard(post: Post, viewModel: PolyvandViewModel, multiplier: Float) {
                                 model = post.mediaUrl,
                                 contentDescription = "پیش‌نمایش ویدیو کانال",
                                 modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                error = painterResource(id = android.R.drawable.ic_media_play)
+                                contentScale = ContentScale.Crop
                             )
                             
                             // Mask layer
