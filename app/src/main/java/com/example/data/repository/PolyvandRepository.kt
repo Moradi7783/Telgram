@@ -310,20 +310,38 @@ class PolyvandRepository(
 
             listOf(
                 Post(
-                    id = "post_${cleanUsername}_1",
+                    id = "post_${cleanUsername}_img",
                     channelUsername = cleanUsername,
-                    message = "📢 **خبر فوری کانال @$cleanUsername**\n\nاین پست اخیراً از طریق همگام‌ساز سرور آینه محلی با موفقیت بازیابی شد.\n\nترافیک مخابراتی شما به آدرس $mirrorUrl هدایت شده و بدون فیلتر در بستر شبکه ملی در کمتر از $latency میلی‌ثانیه واکشی شده است.\n\nبرای پایداری حتماً در تب همتا دکمه اشتراک فیزیکی را روشن کنید تا دوستان شما نیز بدون اتصال اینترنت بتوانند مطالب را داشته باشند.",
+                    message = "🌉 تصویر دریافت شده از کانال @$cleanUsername\n\nتصاویر کانال‌ها جهت بهینه‌سازی مصرف حجم پهنای باند فشرده شده و به صورت آفلاین در حافظه کش دستگاه ذخیره گشته‌اند تا در شرایط فیلترینگ شدید و قطع کل اینترنت جهانی بدون کوچکترین اتلاف وقت فوراً باز شوند.",
                     date = currentTime,
-                    viewsCount = "1.2K",
-                    mediaType = "text"
+                    viewsCount = "5.8K",
+                    mediaType = "image",
+                    mediaUrl = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop"
                 ),
                 Post(
-                    id = "post_${cleanUsername}_2",
+                    id = "post_${cleanUsername}_vid",
                     channelUsername = cleanUsername,
-                    message = "📍 **اطلاعیه همگام‌ساز آفلاین پلیوند**\n\nمحتوای تکمیلی کانال $cleanUsername هم‌اکنون به پایگاه داده داخلی Room در دیسک ذخیره شد. دسترسی به این پیام کاملاً بدون شبکه تضمین شده است.\n\nزمان ذخیره بر روی اندروید: " +
-                            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(currentTime)),
-                    date = currentTime - 3200000,
-                    viewsCount = "2.3K",
+                    message = "🎬 فایل ویدیویی کانال @$cleanUsername\n\nویدیو پیوست با فشرده‌سازی حداکثری و پهنای باند نیم‌بها برای دور زدن فیلترینگ ذخیره شده است. شامل آموزش راه‌اندازی پل‌های فیزیکی برای به اشتراک‌گذاری دیتای ملی.",
+                    date = currentTime - 1800000,
+                    viewsCount = "12.4K",
+                    mediaType = "video",
+                    mediaUrl = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop"
+                ),
+                Post(
+                    id = "post_${cleanUsername}_aud",
+                    channelUsername = cleanUsername,
+                    message = "🎵 فایل پخش صوتی / آهنگ کانال @$cleanUsername\n\nنسخه بهینه شده پادکست رادیویی آزادنت با فرمت فشرده که با بالاترین سرعت از آینه بومی دریافت شده است. دکمه پخش را برای گوش دادن آفلاین فشار دهید.",
+                    date = currentTime - 3600000,
+                    viewsCount = "8.2K",
+                    mediaType = "audio",
+                    mediaUrl = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop"
+                ),
+                Post(
+                    id = "post_${cleanUsername}_txt",
+                    channelUsername = cleanUsername,
+                    message = "💡 گزارش همگام‌سازی ضدسانسور @$cleanUsername\n\nتمام بسته‌های متنی از طریق پایپ‌لاین‌های چندگانه سرورهای بومی $mirrorUrl واکشی و هش‌بندی شد. این اطلاعات از این پس روی دیسک تلفن همراهتان آفلاین است.",
+                    date = currentTime - 7200000,
+                    viewsCount = "4.1K",
                     mediaType = "text"
                 )
             )

@@ -40,6 +40,9 @@ import com.example.ui.theme.TextGreenMuted
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Brush
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -926,29 +929,384 @@ fun PostItemCard(post: Post, viewModel: PolyvandViewModel, multiplier: Float) {
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Rich Multi-Media Render Block (Images, Videos, Audios)
+            if (!post.mediaUrl.isNullOrEmpty() || post.mediaType == "image" || post.mediaType == "video" || post.mediaType == "audio") {
+                Spacer(modifier = Modifier.height(10.dp))
+                when (post.mediaType) {
+                    "image" -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(190.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+                        ) {
+                            AsyncImage(
+                                model = post.mediaUrl,
+                                contentDescription = "قالب تصویری کانال",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                error = painterResource(id = android.R.drawable.ic_menu_gallery)
+                            )
+                            
+                            // High-speed local cache alert tag
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xE0001D35))
+                                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(5.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFF00E676))
+                                    )
+                                    Text(
+                                        text = "پیش‌نمایش کش شده",
+                                        fontSize = 8.sp,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    "video" -> {
+                        var isPlaying by remember { mutableStateOf(false) }
+                        var videoProgress by remember { mutableStateOf(0.35f) }
+                        
+                        LaunchedEffect(isPlaying) {
+                            if (isPlaying) {
+                                while (isPlaying) {
+                                    kotlinx.coroutines.delay(100)
+                                    videoProgress = (videoProgress + 0.005f)
+                                    if (videoProgress >= 1f) {
+                                        videoProgress = 0f
+                                        isPlaying = false
+                                    }
+                                }
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(190.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+                        ) {
+                            AsyncImage(
+                                model = post.mediaUrl,
+                                contentDescription = "پیش‌نمایش ویدیو کانال",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                error = painterResource(id = android.R.drawable.ic_media_play)
+                            )
+                            
+                            // Mask layer
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = if (isPlaying) 0.15f else 0.45f))
+                            )
+
+                            // Play and Pause Trigger icon
+                            IconButton(
+                                onClick = { isPlaying = !isPlaying },
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(52.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.9f))
+                            ) {
+                                Icon(
+                                    imageVector = if (isPlaying) Icons.Default.Close else Icons.Default.PlayArrow,
+                                    contentDescription = "پخش ویدیو",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(26.dp)
+                                )
+                            }
+
+                            // Interactive Seekbar & progress bar overlay
+                            Column(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth()
+                                    .background(
+                                        Brush.verticalGradient(
+                                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f))
+                                        )
+                                    )
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val currentSecs = (videoProgress * 154).toInt()
+                                    val min = currentSecs / 60
+                                    val sec = currentSecs % 60
+                                    Text(
+                                        text = String.format("%02d:%02d / 02:34", min, sec),
+                                        color = Color.White,
+                                        fontSize = 8.5.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(5.dp)
+                                                .clip(CircleShape)
+                                                .background(if (isPlaying) Color.Green else Color.LightGray)
+                                        )
+                                        Text(
+                                            text = if (isPlaying) "در حال تماشای ویدیو (پسیو)" else "فایل ویدیو (ذخیره دستگاه)",
+                                            color = Color.White,
+                                            fontSize = 8.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                                
+                                Spacer(modifier = Modifier.height(4.dp))
+                                
+                                // Progress Track background
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(3.dp)
+                                        .clip(RoundedCornerShape(1.5.dp))
+                                        .background(Color.White.copy(alpha = 0.3f))
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .fillMaxWidth(videoProgress)
+                                            .background(MaterialTheme.colorScheme.primary)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    "audio" -> {
+                        var isAudioPlaying by remember { mutableStateOf(false) }
+                        var audioProgress by remember { mutableStateOf(0.18f) }
+                        
+                        LaunchedEffect(isAudioPlaying) {
+                            if (isAudioPlaying) {
+                                while (isAudioPlaying) {
+                                    kotlinx.coroutines.delay(100)
+                                    audioProgress = (audioProgress + 0.003f)
+                                    if (audioProgress >= 1f) {
+                                        audioProgress = 0f
+                                        isAudioPlaying = false
+                                    }
+                                }
+                            }
+                        }
+
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)),
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp))
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Right Side: Sound graph visualizer animation rows
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.height(22.dp)
+                                ) {
+                                    val waveHeights = if (isAudioPlaying) {
+                                        listOf(12, 22, 10, 16, 6, 20, 8, 14)
+                                    } else {
+                                        listOf(6, 6, 6, 6, 6, 6, 6, 6)
+                                    }
+                                    waveHeights.forEachIndexed { i, h ->
+                                        val heightVal = if (isAudioPlaying) {
+                                            remember(audioProgress) { (h + (Math.random() * 6 - 3)).toInt().coerceIn(3, 24) }
+                                        } else h
+                                        Box(
+                                            modifier = Modifier
+                                                .width(2.5.dp)
+                                                .height(heightVal.dp)
+                                                .clip(RoundedCornerShape(1.25.dp))
+                                                .background(if (isAudioPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f))
+                                        )
+                                    }
+                                }
+
+                                // Central Track details
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    Text(
+                                        text = "فایل صوتی / پادکست کانال • Mp3",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        textAlign = TextAlign.Right
+                                    )
+                                    
+                                    Spacer(modifier = Modifier.height(3.dp))
+                                    
+                                    // Custom visual tracker progress
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(3.dp)
+                                            .clip(RoundedCornerShape(1.5.dp))
+                                            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f))
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxHeight()
+                                                .fillMaxWidth(audioProgress)
+                                                .background(MaterialTheme.colorScheme.primary)
+                                        )
+                                    }
+                                    
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        val audioSecs = (audioProgress * 258).toInt()
+                                        val curM = audioSecs / 60
+                                        val curS = audioSecs % 60
+                                        Text(
+                                            text = String.format("%02d:%02d", curM, curS),
+                                            fontSize = 8.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = "04:18 • آهنگ همگام",
+                                            fontSize = 8.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+
+                                // Interactive local control trigger
+                                IconButton(
+                                    onClick = { isAudioPlaying = !isAudioPlaying },
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary)
+                                ) {
+                                    Icon(
+                                        imageVector = if (isAudioPlaying) Icons.Filled.Close else Icons.Filled.PlayArrow,
+                                        contentDescription = "کنترل صوتی",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
             )
 
-            // Date stamp footer
+            // Dynamic Action Bar & Clipboard instant Text Copier
+            val clipboardManager = LocalClipboardManager.current
+            var isTextCopied by remember { mutableStateOf(false) }
+            LaunchedEffect(isTextCopied) {
+                if (isTextCopied) {
+                    kotlinx.coroutines.delay(1500)
+                    isTextCopied = false
+                }
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "بازیابی زودهنگام: ${viewModel.formatTimestamp(post.date)}",
-                    fontSize = (9 * multiplier).sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Default.Check, 
-                    contentDescription = "ذخیره لوکال",
-                    modifier = Modifier.size(11.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                // Left Side: Status date footer metrics
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check, 
+                        contentDescription = "ذخیره لوکال",
+                        modifier = Modifier.size(12.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "محلی پایدار • ${viewModel.formatTimestamp(post.date)}",
+                        fontSize = (9 * multiplier).sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                // Right Side: Clipboard and offline bookmarks
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Modern styled Copy Button with state transition
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(
+                                if (isTextCopied) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = if (isTextCopied) Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .clickable {
+                                clipboardManager.setText(AnnotatedString(post.message))
+                                isTextCopied = true
+                            }
+                            .padding(horizontal = 10.dp, vertical = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (isTextCopied) "کپی شد!" else "کپی پیام",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isTextCopied) Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Icon(
+                            imageVector = if (isTextCopied) Icons.Default.Check else Icons.Default.Share,
+                            contentDescription = "کپی پیام",
+                            tint = if (isTextCopied) Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(12.dp)
+                        )
+                    }
+                }
             }
         }
     }
