@@ -555,23 +555,35 @@ fun FeedTabScreen(viewModel: PolyvandViewModel, multiplier: Float) {
 
                                 // Stylish Circle Avatar
                                 val avatarInitials = if (selectedClean.length >= 2) selectedClean.take(2).uppercase() else selectedClean.take(1).uppercase()
-                                Box(
-                                    modifier = Modifier
-                                        .size(46.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            Brush.linearGradient(
-                                                colors = listOf(Color(0xFFD3E3FD), Color(0xFFFDE293))
-                                            )
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = avatarInitials,
-                                        color = Color(0xFF001D35),
-                                        fontWeight = FontWeight.Black,
-                                        fontSize = 14.sp
+                                if (channelInfo?.avatarUrl != null && channelInfo.avatarUrl.startsWith("http")) {
+                                    AsyncImage(
+                                        model = channelInfo.avatarUrl,
+                                        contentDescription = "آواتار کانال",
+                                        modifier = Modifier
+                                            .size(46.dp)
+                                            .clip(CircleShape)
+                                            .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, CircleShape),
+                                        contentScale = ContentScale.Crop
                                     )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(46.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                Brush.linearGradient(
+                                                    colors = listOf(Color(0xFFD3E3FD), Color(0xFFFDE293))
+                                                )
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = avatarInitials,
+                                            color = Color(0xFF001D35),
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = 14.sp
+                                        )
+                                    }
                                 }
                             }
                         }
